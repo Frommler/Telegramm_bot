@@ -6,25 +6,18 @@ const Bot = new Telegraf(TOKEN);
 let dataFromServer = [];
 let dateOfServer = "";
 
+function getCurrentDay() {
+  var date = new Date();
+  var current_date =
+    date.getFullYear() +
+    "-" +
+    ("0" + (date.getMonth() + 1)).slice(-2) +
+    "-" +
+    date.getDate();
+  return current_date;
+}
+
 Bot.start((ctx) => {
-  fetch("https://russianwarship.rip/api/v1/statistics/latest", {
-    method: "get",
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((res) => {
-      return res.json();
-    })
-    .then((data) => {
-      // return ctx.reply(data.data.stats[ctx.message.text.toLowerCase()]);
-      dateOfServer = data.data.date;
-      var date = new Date();
-      var current_date =
-        date.getFullYear() + "-" + (("0"+ (date.getMonth() + 1)).slice(-2)) + "-" + date.getDate();
-      dataFromServer = data.data.stats;
-      console.log(dateOfServer);
-      console.log(current_date);
-    })
-    .catch((err) => ctx.reply("What do you mean?"));
   return ctx.reply("Welcome");
 });
 
@@ -33,7 +26,7 @@ Bot.hears(/hi+/i, (ctx) => {
   ctx.reply("Hello!");
 });
 
-Bot.hears(/[А-Я]+/i, (ctx) => {
+Bot.hears(/[A-Я]+/i, (ctx) => {
   let key = "";
   console.log(ctx.message.text);
   switch (ctx.message.text.toLowerCase()) {
@@ -49,7 +42,26 @@ Bot.hears(/[А-Я]+/i, (ctx) => {
     default:
       return ctx.reply("Sorry. I have no these word");
   }
-  ctx.reply(dataFromServer[key]);
+  if (getCurrentDay() != dateOfServer) {
+    fetch("https://russianwarship.rip/api/v1/statistics/latest", {
+      method: "get",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        // return ctx.reply(data.data.stats[ctx.message.text.toLowerCase()]);
+        dateOfServer = data.data.date;
+        dataFromServer = data.data.stats;
+        console.log("Went to server.");
+        ctx.reply(dataFromServer[key]);
+      })
+      .catch((err) => ctx.reply("What do you mean?"));
+  } else {
+    ctx.reply(dataFromServer[key]);
+    console.log("Didn`t go to server.");
+  };
 });
 
 Bot.launch();
