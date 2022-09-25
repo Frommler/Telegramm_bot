@@ -1,0 +1,19 @@
+{
+  "name": "alexsmith777bot",
+  "version": "1.0.0",
+  "description": "Telegramm bot fot my coins collection",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "coins",
+    "bot",
+    "telegram"
+  ],
+  "author": "Alex Vakula",
+  "license": "ISC",
+  "dependencies": {
+    "telegraf": "^4.9.2"
+  }
+}
