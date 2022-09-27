@@ -5,6 +5,7 @@ const Bot = new Telegraf(TOKEN);
 
 let dataFromServer = [];
 let dateOfServer = "";
+let userChoise = "";
 
 function getCurrentDay() {
   var date = new Date();
@@ -18,7 +19,27 @@ function getCurrentDay() {
 }
 
 Bot.start((ctx) => {
-  return ctx.reply("Welcome");
+  ctx.reply("Welcome");
+  const opts = {
+    reply_markup: {
+      inline_keyboard: 
+      [
+          [{text: 'All stats', callback_data:'all'},{text: 'Last day', callback_data:'day'}],
+          [{text: 'Resource', url:'https://russianwarship.rip/api/v1/statistics/latest'}],
+      ]
+  }
+};
+  ctx.replyWithHTML("Kuku", opts);
+});
+
+Bot.action('all', (ctx) => {
+  ctx.reply("You choise all");
+  userChoise = "stats";
+});
+
+Bot.action('day', (ctx) => {
+  ctx.reply("You choise day");
+  userChoise = "increase";
 });
 
 Bot.hears(/hi+/i, (ctx) => {
@@ -53,13 +74,13 @@ Bot.hears(/[A-Я]+/i, (ctx) => {
       .then((data) => {
         // return ctx.reply(data.data.stats[ctx.message.text.toLowerCase()]);
         dateOfServer = data.data.date;
-        dataFromServer = data.data.stats;
-        console.log("Went to server.");
-        ctx.reply(dataFromServer[key]);
+        dataFromServer = data;
+        console.log("Go to server");
+        ctx.reply(dataFromServer.data[userChoise][key]);
       })
       .catch((err) => ctx.reply("What do you mean?"));
   } else {
-    ctx.reply(dataFromServer[key]);
+    ctx.reply(dataFromServer.data[userChoise][key]);
     console.log("Didn`t go to server.");
   };
 });
